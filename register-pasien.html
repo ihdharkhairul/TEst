@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrasi Pasien — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-secondary min-h-screen flex items-center justify-center p-4">
+  <div class="card-soft w-full max-w-lg p-8 my-8">
+    <div class="text-center mb-7">
+      <a href="index.html" class="inline-flex items-center gap-2 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-display font-bold text-lg">H</div>
+        <span class="font-display font-bold text-lg">HyperCare</span>
+      </a>
+      <h1 class="font-display font-bold text-xl">Daftar sebagai Pasien</h1>
+      <p class="text-sm text-[#64748B] mt-1">Mulai pantau tekanan darah Anda bersama HyperCare</p>
+    </div>
+    <form id="formRegister" class="space-y-4">
+      <div><label class="text-sm font-medium block mb-1">Nama Lengkap</label><input class="input-soft" placeholder="masukan nama lengkap" required></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-sm font-medium block mb-1">Nomor HP</label><input class="input-soft" placeholder="08xxxxxxxxxx" required></div>
+        <div><label class="text-sm font-medium block mb-1">Email</label><input type="email" class="input-soft" placeholder="masukan email" required></div>
+      </div>
+      <div><label class="text-sm font-medium block mb-1">Password</label><input type="password" class="input-soft" placeholder="masukan password" required></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Jenis Kelamin</label>
+          <select class="input-soft"><option>Laki-laki</option><option>Perempuan</option></select>
+        </div>
+        <div><label class="text-sm font-medium block mb-1">Tanggal Lahir</label><input type="date" class="input-soft"></div>
+      </div>
+      <div>
+        <label class="text-sm font-medium block mb-1">Agama</label>
+        <select class="input-soft"><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option></select>
+      </div>
+      <div><label class="text-sm font-medium block mb-1">Alamat Tempat Tinggal</label><textarea class="input-soft" rows="2" placeholder="masukan alamat lengkap"></textarea></div>
+      <button type="submit" class="btn-primary w-full">Daftar</button>
+    </form>
+    <p class="text-center text-sm text-[#64748B] mt-5">Sudah punya akun? <a href="login-pasien.html" class="text-primary font-semibold text-hover">Masuk</a></p>
+  </div>
+
+<script src="assets/js/components.js"></script>
+<script>
+document.getElementById('formRegister').addEventListener('submit', function(e){
+  e.preventDefault();
+  hcToast('Registrasi Berhasil (Demo)', 'success');
+  setTimeout(()=> window.location.href = 'login-pasien.html', 1200);
+});
+</script>
+</body>
+</html>

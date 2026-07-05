@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konsultasi Perawat — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="pasien" data-active="konsultasi"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Budi Santoso" data-role="Pasien" data-photo="https://i.pravatar.cc/150?img=68"></div>
+    <main class="p-5 md:p-8">
+      <div class="card-soft flex h-[calc(100vh-150px)] overflow-hidden">
+        <!-- daftar perawat -->
+        <div class="w-[280px] border-r border-[#F1EDE3] flex-col hidden md:flex">
+          <div class="p-4 border-b border-[#F1EDE3]"><input class="input-soft text-sm" placeholder="Cari perawat..."></div>
+          <div id="hc-nurse-list" class="overflow-y-auto scrollbar-thin flex-1"></div>
+        </div>
+        <!-- chat window -->
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center gap-3 p-4 border-b border-[#F1EDE3]">
+            <img src="https://i.pravatar.cc/150?img=47" class="w-10 h-10 rounded-full object-cover" id="hc-chat-photo">
+            <div>
+              <p class="font-medium text-sm" id="hc-chat-name">Ns. Siti Aisyah, S.Kep</p>
+              <p class="text-xs text-[#22A559]"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
+            </div>
+          </div>
+          <div id="hc-chat-body" class="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-4 bg-[#FFFDF8]"></div>
+          <form id="hc-chat-form" class="p-4 border-t border-[#F1EDE3] flex gap-2">
+            <input id="hc-chat-input" class="input-soft" placeholder="Tulis pesan...">
+            <button class="btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+const nurseListEl = document.getElementById('hc-nurse-list');
+HC_NURSES.forEach((n,i) => {
+  nurseListEl.insertAdjacentHTML('beforeend', `
+    <button class="w-full flex items-center gap-3 p-3 hover:bg-secondary text-left ${i===0?'bg-secondary':''}" onclick="hcSwitchNurse(${i}, this)">
+      <img src="${n.photo}" class="w-11 h-11 rounded-full object-cover">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium truncate">${n.name}</p>
+        <p class="text-xs text-[#94A3B8] truncate">${n.online?'Online':'Offline'} · ${n.spec}</p>
+      </div>
+    </button>`);
+});
+
+const chatBody = document.getElementById('hc-chat-body');
+const histories = HC_NURSES.map(n => ([
+  { from:'them', text:`Halo, saya ${n.name.split(',')[0]}. Bagaimana kondisi tekanan darah Anda hari ini?`, time:'09:30' },
+  { from:'me', text:'Pagi, tekanan darah saya tadi pagi 120/80, terasa cukup baik.', time:'09:32' },
+  { from:'them', text:'Bagus sekali, tetap pertahankan pola makan rendah garam dan rutin berolahraga ringan ya 🙂', time:'09:33' },
+]));
+
+function renderChat(idx){
+  chatBody.innerHTML = '';
+  histories[idx].forEach(m => {
+    chatBody.insertAdjacentHTML('beforeend', `
+      <div class="flex ${m.from==='me'?'justify-end':'justify-start'}">
+        <div class="max-w-[75%] ${m.from==='me'?'chat-bubble-me':'chat-bubble-other'} px-4 py-2 text-sm">
+          ${m.text}
+          <div class="text-[10px] opacity-70 mt-1 text-right">${m.time}</div>
+        </div>
+      </div>`);
+  });
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function hcSwitchNurse(i, el){
+  const n = HC_NURSES[i];
+  document.getElementById('hc-chat-name').textContent = n.name;
+  document.getElementById('hc-chat-photo').src = n.photo;
+  nurseListEl.querySelectorAll('button').forEach(b => b.classList.remove('bg-secondary'));
+  el.classList.add('bg-secondary');
+  renderChat(i);
+  window.hcCurrentNurse = i;
+}
+window.hcCurrentNurse = 0;
+renderChat(0);
+
+document.getElementById('hc-chat-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const input = document.getElementById('hc-chat-input');
+  if(!input.value.trim()) return;
+  const time = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  histories[window.hcCurrentNurse].push({from:'me', text:input.value, time});
+  renderChat(window.hcCurrentNurse);
+  input.value='';
+  setTimeout(()=>{
+    histories[window.hcCurrentNurse].push({from:'them', text:'Baik, terima kasih informasinya. Saya catat ya 📝', time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+    renderChat(window.hcCurrentNurse);
+  }, 900);
+});
+</script>
+</body>
+</html>

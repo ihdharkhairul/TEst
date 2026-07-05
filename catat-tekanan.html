@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catat Tekanan Darah — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="pasien" data-active="catat"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Budi Santoso" data-role="Pasien" data-photo="https://i.pravatar.cc/150?img=68"></div>
+    <main class="p-5 md:p-8 grid lg:grid-cols-3 gap-6">
+      <form id="formTekanan" class="card-soft p-6 lg:col-span-1 space-y-4 h-fit">
+        <h3 class="font-semibold mb-1">Catat Tekanan Darah</h3>
+        <div><label class="text-sm font-medium block mb-1">Tanggal Pemeriksaan</label><input type="date" id="tgl" class="input-soft" required></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-sm font-medium block mb-1">Sistolik</label><input type="number" id="sistol" class="input-soft" placeholder="120" required></div>
+          <div><label class="text-sm font-medium block mb-1">Diastolik</label><input type="number" id="diastol" class="input-soft" placeholder="80" required></div>
+        </div>
+        <div><label class="text-sm font-medium block mb-1">Denyut Nadi</label><input type="number" id="nadi" class="input-soft" placeholder="78 bpm"></div>
+        <div><label class="text-sm font-medium block mb-1">Berat Badan (kg)</label><input type="number" id="berat" class="input-soft" placeholder="65"></div>
+        <div><label class="text-sm font-medium block mb-1">Catatan</label><textarea id="catatan" class="input-soft" rows="2" placeholder="contoh: setelah berolahraga"></textarea></div>
+        <button type="submit" class="btn-primary w-full">Simpan Data</button>
+      </form>
+
+      <div class="card-soft p-6 lg:col-span-2">
+        <h3 class="font-semibold mb-4">Data Pemeriksaan Terbaru</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]">
+              <th class="py-2">Tanggal</th><th>Tekanan Darah</th><th>Nadi</th><th>Berat</th><th>Status</th>
+            </tr></thead>
+            <tbody id="tabelTekanan"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+function statusOf(sis, dia){
+  if(sis>=160 || dia>=100) return {label:'Hipertensi Tingkat 2', cls:'badge-tk2'};
+  if(sis>=140 || dia>=90) return {label:'Hipertensi Tingkat 1', cls:'badge-tk1'};
+  if(sis>=130 || dia>=85) return {label:'Pra Hipertensi', cls:'badge-pra'};
+  return {label:'Normal', cls:'badge-normal'};
+}
+function renderRow(d){
+  const tbody = document.getElementById('tabelTekanan');
+  const st = statusOf(d.sistol, d.diastol);
+  const row = document.createElement('tr');
+  row.className = 'border-b border-[#F8F5EC]';
+  row.innerHTML = `<td class="py-3">${d.tgl}</td><td>${d.sistol}/${d.diastol} mmHg</td><td>${d.nadi||'-'}</td><td>${d.berat?d.berat+' kg':'-'}</td><td><span class="badge-status ${st.cls}">${st.label}</span></td>`;
+  tbody.prepend(row);
+}
+HC_RIWAYAT.slice().reverse().forEach(d => renderRow({tgl:d.tgl, sistol:d.sistol, diastol:d.diastol}));
+
+document.getElementById('formTekanan').addEventListener('submit', function(e){
+  e.preventDefault();
+  const data = {
+    tgl: document.getElementById('tgl').value || new Date().toLocaleDateString('id-ID'),
+    sistol: parseInt(document.getElementById('sistol').value),
+    diastol: parseInt(document.getElementById('diastol').value),
+    nadi: document.getElementById('nadi').value,
+    berat: document.getElementById('berat').value,
+  };
+  renderRow(data);
+  hcToast('Data tekanan darah berhasil disimpan', 'success');
+  this.reset();
+});
+</script>
+</body>
+</html>

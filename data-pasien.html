@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Pasien — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="perawat" data-active="datapasien"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Siti Aisyah, S.Kep" data-role="Perawat" data-photo="https://i.pravatar.cc/150?img=47"></div>
+    <main class="p-5 md:p-8">
+      <div class="card-soft p-6">
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+          <h3 class="font-semibold">Data Pasien</h3>
+          <input class="input-soft max-w-xs text-sm" placeholder="Cari nama pasien...">
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]">
+              <th class="py-2">Nama</th><th>Umur</th><th>Jenis Kelamin</th><th>Nomor HP</th><th>Status Hipertensi</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="hc-pasien-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+const body = document.getElementById('hc-pasien-body');
+HC_PASIEN_LIST.forEach(p => {
+  body.insertAdjacentHTML('beforeend', `
+    <tr class="border-b border-[#F8F5EC]">
+      <td class="py-3 font-medium">${p.nama}</td>
+      <td>${p.umur}</td>
+      <td>${p.gender}</td>
+      <td>${p.hp}</td>
+      <td><span class="badge-status ${p.badge}">${p.status}</span></td>
+      <td class="flex gap-2 py-3">
+        <button class="text-xs btn-outline px-3 py-1.5" onclick="hcToast('Membuka detail ${p.nama}', 'info')">Detail</button>
+        <a href="monitoring-pasien.html" class="text-xs btn-primary px-3 py-1.5">Monitoring</a>
+      </td>
+    </tr>`);
+});
+</script>
+</body>
+</html>

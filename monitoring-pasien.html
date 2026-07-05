@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoring Pasien — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="perawat" data-active="monitoring"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Siti Aisyah, S.Kep" data-role="Perawat" data-photo="https://i.pravatar.cc/150?img=47"></div>
+    <main class="p-5 md:p-8 space-y-6">
+      <div class="card-soft p-5 flex items-center gap-4">
+        <img src="https://i.pravatar.cc/150?img=68" class="w-16 h-16 rounded-full object-cover border-4 border-secondary">
+        <div class="flex-1">
+          <h3 class="font-semibold">Budi Santoso</h3>
+          <p class="text-xs text-[#94A3B8]">54 Tahun · Laki-laki · 0812-3456-7001</p>
+        </div>
+        <span class="badge-status badge-normal">Status Risiko: Normal</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="card-soft p-5 lg:col-span-2">
+          <h3 class="font-semibold mb-4">Grafik Tekanan Darah</h3>
+          <canvas id="chartMonitor" height="140"></canvas>
+        </div>
+        <div class="card-soft p-5">
+          <h3 class="font-semibold mb-4">Kategori Risiko</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between"><span class="badge-status badge-normal">Normal</span><span class="text-[#94A3B8]">&lt; 130/85</span></div>
+            <div class="flex items-center justify-between"><span class="badge-status badge-pra">Pra Hipertensi</span><span class="text-[#94A3B8]">130-139/85-89</span></div>
+            <div class="flex items-center justify-between"><span class="badge-status badge-tk1">Hipertensi Tingkat 1</span><span class="text-[#94A3B8]">140-159/90-99</span></div>
+            <div class="flex items-center justify-between"><span class="badge-status badge-tk2">Hipertensi Tingkat 2</span><span class="text-[#94A3B8]">&ge; 160/100</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-soft p-5">
+        <h3 class="font-semibold mb-4">Riwayat Pemeriksaan</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]"><th class="py-2">Tanggal</th><th>Tekanan Darah</th><th>Status</th></tr></thead>
+            <tbody id="hc-monitor-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+new Chart(document.getElementById('chartMonitor'), {
+  type:'line',
+  data:{
+    labels: HC_RIWAYAT.map(d=>d.tgl),
+    datasets:[
+      { label:'Sistolik', data: HC_RIWAYAT.map(d=>d.sistol), borderColor:'#F4A300', backgroundColor:'#F4A30022', tension:.4, fill:true },
+      { label:'Diastolik', data: HC_RIWAYAT.map(d=>d.diastol), borderColor:'#94A3B8', backgroundColor:'#94A3B822', tension:.4, fill:true }
+    ]
+  },
+  options:{ scales:{ y:{ suggestedMin:60, suggestedMax:170 } } }
+});
+const body = document.getElementById('hc-monitor-body');
+HC_RIWAYAT.forEach(d => {
+  body.insertAdjacentHTML('beforeend', `<tr class="border-b border-[#F8F5EC]"><td class="py-3">${d.tgl}</td><td>${d.sistol}/${d.diastol} mmHg</td><td><span class="badge-status ${d.badge}">${d.status}</span></td></tr>`);
+});
+</script>
+</body>
+</html>

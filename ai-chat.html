@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat Hipertensi — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="pasien" data-active="aichat"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Budi Santoso" data-role="Pasien" data-photo="https://i.pravatar.cc/150?img=68"></div>
+    <main class="p-5 md:p-8">
+      <div class="card-soft flex flex-col h-[calc(100vh-150px)] overflow-hidden">
+        <div class="flex items-center gap-3 p-4 border-b border-[#F1EDE3]">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white"><i class="fa-solid fa-robot"></i></div>
+          <div>
+            <p class="font-medium text-sm">AI Health Assistant HyperCare</p>
+            <p class="text-xs text-[#22A559]"><i class="fa-solid fa-circle text-[8px]"></i> Selalu Aktif</p>
+          </div>
+        </div>
+        <div id="hc-ai-body" class="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-4 bg-[#FFFDF8]"></div>
+        <div id="hc-quick" class="px-5 pb-3 flex gap-2 flex-wrap"></div>
+        <form id="hc-ai-form" class="p-4 border-t border-[#F1EDE3] flex gap-2">
+          <input id="hc-ai-input" class="input-soft" placeholder="Tulis pertanyaan seputar hipertensi...">
+          <button class="btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+const aiBody = document.getElementById('hc-ai-body');
+function nowTime(){ return new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}); }
+
+function addBubble(from, text, time){
+  aiBody.insertAdjacentHTML('beforeend', `
+    <div class="flex ${from==='me'?'justify-end':'justify-start'}">
+      <div class="max-w-[80%] ${from==='me'?'chat-bubble-me':'chat-bubble-other'} px-4 py-2 text-sm">
+        ${text}
+        <div class="text-[10px] opacity-70 mt-1 text-right">${time}</div>
+      </div>
+    </div>`);
+  aiBody.scrollTop = aiBody.scrollHeight;
+}
+
+function addTyping(){
+  const id = 'typing-' + Date.now();
+  aiBody.insertAdjacentHTML('beforeend', `
+    <div class="flex justify-start" id="${id}">
+      <div class="chat-bubble-other px-4 py-3 flex gap-1"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+    </div>`);
+  aiBody.scrollTop = aiBody.scrollHeight;
+  return id;
+}
+
+addBubble('them', 'Halo 👋 Saya adalah AI Health Assistant HyperCare. Saya siap membantu menjawab pertanyaan seputar hipertensi, tekanan darah, pola makan sehat, olahraga, dan gaya hidup sehat.', nowTime());
+
+const quickEl = document.getElementById('hc-quick');
+HC_AI_QUICK.forEach(q => {
+  quickEl.insertAdjacentHTML('beforeend', `<button class="text-xs bg-secondary text-hover text-[#8A6212] px-3 py-1.5 rounded-full hover:bg-primary hover:text-white transition" onclick="hcAskAI('${q.replace(/'/g, "\\'")}')">${q}</button>`);
+});
+
+function hcAskAI(text){
+  addBubble('me', text, nowTime());
+  const typingId = addTyping();
+  setTimeout(() => {
+    document.getElementById(typingId).remove();
+    addBubble('them', hcAIReply(text), nowTime());
+  }, 1000 + Math.random()*500);
+}
+
+document.getElementById('hc-ai-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const input = document.getElementById('hc-ai-input');
+  if(!input.value.trim()) return;
+  hcAskAI(input.value.trim());
+  input.value = '';
+});
+</script>
+</body>
+</html>

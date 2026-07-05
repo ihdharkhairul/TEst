@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konsultasi — HyperCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-body bg-[#FAF8F2]">
+<div class="flex">
+  <div data-component="sidebar" data-role="perawat" data-active="chatperawat"></div>
+  <div class="flex-1 min-w-0">
+    <div data-component="topbar" data-name="Siti Aisyah, S.Kep" data-role="Perawat" data-photo="https://i.pravatar.cc/150?img=47"></div>
+    <main class="p-5 md:p-8">
+      <div class="card-soft flex h-[calc(100vh-150px)] overflow-hidden">
+        <div class="w-[280px] border-r border-[#F1EDE3] flex-col hidden md:flex">
+          <div class="p-4 border-b border-[#F1EDE3]"><input class="input-soft text-sm" placeholder="Cari pasien..."></div>
+          <div id="hc-patient-list" class="overflow-y-auto scrollbar-thin flex-1"></div>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center gap-3 p-4 border-b border-[#F1EDE3]">
+            <img src="https://i.pravatar.cc/150?img=68" class="w-10 h-10 rounded-full object-cover" id="hc-pchat-photo">
+            <div><p class="font-medium text-sm" id="hc-pchat-name">Budi Santoso</p><p class="text-xs text-[#94A3B8]">Pasien</p></div>
+          </div>
+          <div id="hc-pchat-body" class="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-4 bg-[#FFFDF8]"></div>
+          <form id="hc-pchat-form" class="p-4 border-t border-[#F1EDE3] flex gap-2">
+            <input id="hc-pchat-input" class="input-soft" placeholder="Balas pesan pasien...">
+            <button class="btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+const patients = [
+  { nama:'Budi Santoso', photo:'https://i.pravatar.cc/150?img=68', last:'Pagi, tekanan darah saya 120/80...' },
+  { nama:'Dewi Lestari', photo:'https://i.pravatar.cc/150?img=32', last:'Apakah aman minum kopi setiap hari?' },
+  { nama:'Ahmad Fauzi', photo:'https://i.pravatar.cc/150?img=15', last:'Terima kasih sarannya, Sus 🙏' },
+];
+const listEl = document.getElementById('hc-patient-list');
+const histories = patients.map(p => ([
+  { from:'them', text:p.last, time:'09:30' },
+  { from:'me', text:'Baik, terima kasih sudah melapor. Tetap jaga pola makan ya 🙂', time:'09:35' },
+]));
+patients.forEach((p,i) => {
+  listEl.insertAdjacentHTML('beforeend', `
+    <button class="w-full flex items-center gap-3 p-3 hover:bg-secondary text-left ${i===0?'bg-secondary':''}" onclick="hcSwitchPatient(${i}, this)">
+      <img src="${p.photo}" class="w-11 h-11 rounded-full object-cover">
+      <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${p.nama}</p><p class="text-xs text-[#94A3B8] truncate">${p.last}</p></div>
+    </button>`);
+});
+const chatBody = document.getElementById('hc-pchat-body');
+function renderChat(i){
+  chatBody.innerHTML='';
+  histories[i].forEach(m => {
+    chatBody.insertAdjacentHTML('beforeend', `
+      <div class="flex ${m.from==='me'?'justify-end':'justify-start'}">
+        <div class="max-w-[75%] ${m.from==='me'?'chat-bubble-me':'chat-bubble-other'} px-4 py-2 text-sm">${m.text}<div class="text-[10px] opacity-70 mt-1 text-right">${m.time}</div></div>
+      </div>`);
+  });
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function hcSwitchPatient(i, el){
+  document.getElementById('hc-pchat-name').textContent = patients[i].nama;
+  document.getElementById('hc-pchat-photo').src = patients[i].photo;
+  listEl.querySelectorAll('button').forEach(b=>b.classList.remove('bg-secondary'));
+  el.classList.add('bg-secondary');
+  renderChat(i);
+  window.hcCurrentPatient = i;
+}
+window.hcCurrentPatient = 0;
+renderChat(0);
+document.getElementById('hc-pchat-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const input = document.getElementById('hc-pchat-input');
+  if(!input.value.trim()) return;
+  histories[window.hcCurrentPatient].push({from:'me', text:input.value, time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+  renderChat(window.hcCurrentPatient);
+  input.value='';
+});
+</script>
+</body>
+</html>
