@@ -1,105 +1,1062 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Konsultasi Perawat — HyperCare</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HyperCare — Perawat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = { theme: { extend: { colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00' }, fontFamily:{ display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] } } } }</script>
-<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: { primary:'#F4A300', secondary:'#FFF8E7', hover:'#D88C00', textdark:'#1E293B' },
+        fontFamily: { display:['Sora','sans-serif'], body:['Plus Jakarta Sans','sans-serif'] }
+      }
+    }
+  }
+</script>
+<style>
+:root{
+  --primary:#F4A300; --primary-dark:#D88C00; --secondary:#FFF8E7;
+  --text:#1E293B; --bg:#FFFFFF; --success:#22A559; --warning:#F4A300;
+  --danger:#E53E3E; --muted:#94A3B8;
+}
+*{font-family:'Plus Jakarta Sans', sans-serif;}
+.font-display{font-family:'Sora', sans-serif;}
+body{ color:var(--text); background:var(--bg); }
+.bg-primary{ background-color:var(--primary)!important; }
+.bg-secondary{ background-color:var(--secondary)!important; }
+.text-primary{ color:var(--primary)!important; }
+.text-hover:hover{ color:var(--primary-dark)!important; }
+.border-primary{ border-color:var(--primary)!important; }
+.btn-primary{ background-color:var(--primary); color:#fff; border-radius:12px; padding:.65rem 1.5rem; font-weight:600;
+  transition: background-color .18s ease, transform .15s ease, box-shadow .18s ease; border:none; display:inline-block; cursor:pointer; }
+.btn-primary:hover{ background-color:var(--primary-dark); color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(180,130,30,.25); }
+.btn-primary:active{ transform:translateY(0) scale(0.97); box-shadow:none; }
+.btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
+.btn-outline{ border:1.5px solid var(--primary); color:var(--primary); border-radius:12px; padding:.6rem 1.45rem; font-weight:600;
+  background:transparent; transition: background-color .18s ease, color .18s ease, transform .15s ease; display:inline-block; cursor:pointer; }
+.btn-outline:hover{ background-color:var(--secondary); color:var(--primary-dark); }
+.btn-outline:active{ transform:scale(0.97); }
+.card-soft{ background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(30,41,59,.06); border:1px solid #F1EDE3;
+  transition: transform .2s ease, box-shadow .2s ease; }
+.input-soft{ border:1.5px solid #E7E2D4; border-radius:12px; padding:.7rem 1rem; width:100%; background:#FFFDF8; transition:border-color .2s; }
+.input-soft:focus{ outline:none; border-color:var(--primary); background:#fff; }
+.badge-status{ display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:600; padding:.3rem .7rem; border-radius:999px; }
+.badge-normal{ background:#E7F8EE; color:#1F9D55; }
+.badge-pra{ background:#FFF3D6; color:#B7791F; }
+.badge-tk1{ background:#FFE3D1; color:#C2410C; }
+.badge-tk2{ background:#FDE2E2; color:#C53030; }
+.sidebar-link{ display:flex; align-items:center; gap:.75rem; padding:.7rem 1rem; border-radius:12px; color:#475569;
+  font-weight:500; font-size:.92rem; transition:all .2s ease; text-decoration:none; cursor:pointer; }
+.sidebar-link:hover{ background:var(--secondary); color:var(--primary-dark); }
+.sidebar-link.active{ background:var(--primary); color:#fff; box-shadow:0 4px 14px rgba(244,163,0,.35); }
+.chat-bubble-me{ background:var(--primary); color:#fff; border-radius:16px 16px 4px 16px; }
+.chat-bubble-other{ background:var(--secondary); color:var(--text); border-radius:16px 16px 16px 4px; }
+.scrollbar-thin::-webkit-scrollbar{width:6px;height:6px;}
+.scrollbar-thin::-webkit-scrollbar-thumb{background:#E7E2D4;border-radius:10px;}
+.hc-toast{ position:fixed; top:20px; right:20px; z-index:999; padding:.75rem 1.25rem; border-radius:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15); color:#fff; font-weight:500; font-size:.875rem; display:flex; align-items:center; gap:.5rem;
+  animation:fadeInDown .3s ease; }
+@keyframes fadeInDown{ from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);} }
+@media (max-width: 1023px){
+  .sidebar-mobile{ position:fixed; left:-280px; top:0; height:100vh; z-index:50; transition:left .25s ease; }
+  .sidebar-mobile.open{ left:0; }
+}
+@media (min-width: 1024px){
+  .sidebar-mobile{ position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+}
+@keyframes pageEnter { from{ opacity:0; transform:translateY(12px);} to{ opacity:1; transform:translateY(0);} }
+.page-transition{ animation: pageEnter 0.28s cubic-bezier(0.22,1,0.36,1) both; }
+</style>
 </head>
-<body class="font-body bg-[#FAF8F2]">
-<div class="flex">
-  <div data-component="sidebar" data-role="pasien" data-active="konsultasi"></div>
-  <div class="flex-1 min-w-0">
-    <div data-component="topbar" data-name="Budi Santoso" data-role="Pasien" data-photo="https://i.pravatar.cc/150?img=68"></div>
-    <main class="p-5 md:p-8">
-      <div class="card-soft flex h-[calc(100vh-150px)] overflow-hidden">
-        <!-- daftar perawat -->
-        <div class="w-[280px] border-r border-[#F1EDE3] flex-col hidden md:flex">
-          <div class="p-4 border-b border-[#F1EDE3]"><input class="input-soft text-sm" placeholder="Cari perawat..."></div>
-          <div id="hc-nurse-list" class="overflow-y-auto scrollbar-thin flex-1"></div>
+<body>
+<div id="app"></div>
+<script>
+/* ============================= MOCK DATA ============================= */
+// 2 akun perawat demo — silakan login dengan salah satu di bawah ini
+const nurses = [
+  { id:1, nama:'Ns. Siti Aisyah, S.Kep', email:'perawat1@gmail.com', password:'123456',
+    spesialis:'Spesialis Hipertensi', pengalaman:'5 Tahun Pengalaman',
+    jenis_kelamin:'Perempuan', tanggal_lahir:'1990-05-14',
+    alamat:'Jl. Melati No. 12, Batam Kota, Kepulauan Riau', foto:'https://i.pravatar.cc/150?img=47' },
+  { id:2, nama:'Ns. Rina Amelia, S.Kep', email:'perawat2@gmail.com', password:'123456',
+    spesialis:'Spesialis Hipertensi', pengalaman:'4 Tahun Pengalaman',
+    jenis_kelamin:'Perempuan', tanggal_lahir:'1992-08-20',
+    alamat:'Jl. Anggrek No. 7, Batam Kota, Kepulauan Riau', foto:'https://i.pravatar.cc/150?img=44' },
+];
+let currentNurse = null; // diisi setelah login berhasil
+
+let patients = [
+  {id:1, nama:'Siti Rahayu', email:'siti@example.com', umur:58, jenis_kelamin:'Perempuan', no_hp:'0812-3456-7890', status_terakhir:'Hipertensi Tingkat 1', foto:null},
+  {id:2, nama:'Ahmad Fauzi', email:'ahmad@example.com', umur:65, jenis_kelamin:'Laki-laki', no_hp:'0813-2345-6789', status_terakhir:'Hipertensi Tingkat 2', foto:null},
+  {id:3, nama:'Dewi Lestari', email:'dewi@example.com', umur:47, jenis_kelamin:'Perempuan', no_hp:'0857-1122-3344', status_terakhir:'Pra Hipertensi', foto:null},
+  {id:4, nama:'Bambang Wijaya', email:'bambang@example.com', umur:52, jenis_kelamin:'Laki-laki', no_hp:'0821-9988-7766', status_terakhir:'Normal', foto:null},
+  {id:5, nama:'Rina Marlina', email:'rina@example.com', umur:60, jenis_kelamin:'Perempuan', no_hp:'0838-4455-6677', status_terakhir:'Hipertensi Tingkat 1', foto:null},
+];
+let nextPatientId = 6;
+
+let tekanan = {
+  1:[ {id:1,tanggal:'2026-06-20',sistolik:148,diastolik:94,denyut_nadi:78,berat_badan:64,catatan:'Setelah olahraga ringan',status:'Hipertensi Tingkat 1'},
+      {id:2,tanggal:'2026-06-27',sistolik:142,diastolik:91,denyut_nadi:75,berat_badan:64,catatan:'',status:'Hipertensi Tingkat 1'},
+      {id:3,tanggal:'2026-07-04',sistolik:145,diastolik:92,denyut_nadi:80,berat_badan:63.5,catatan:'Kontrol rutin',status:'Hipertensi Tingkat 1'} ],
+  2:[ {id:4,tanggal:'2026-06-18',sistolik:172,diastolik:108,denyut_nadi:88,berat_badan:80,catatan:'Keluhan pusing',status:'Hipertensi Tingkat 2'},
+      {id:5,tanggal:'2026-06-25',sistolik:168,diastolik:104,denyut_nadi:84,berat_badan:79.5,catatan:'',status:'Hipertensi Tingkat 2'},
+      {id:6,tanggal:'2026-07-02',sistolik:165,diastolik:102,denyut_nadi:82,berat_badan:79,catatan:'',status:'Hipertensi Tingkat 2'} ],
+  3:[ {id:7,tanggal:'2026-06-22',sistolik:134,diastolik:87,denyut_nadi:72,berat_badan:58,catatan:'',status:'Pra Hipertensi'},
+      {id:8,tanggal:'2026-06-29',sistolik:132,diastolik:86,denyut_nadi:70,berat_badan:58,catatan:'',status:'Pra Hipertensi'} ],
+  4:[ {id:9,tanggal:'2026-06-15',sistolik:118,diastolik:78,denyut_nadi:68,berat_badan:70,catatan:'Kondisi baik',status:'Normal'},
+      {id:10,tanggal:'2026-06-30',sistolik:120,diastolik:80,denyut_nadi:70,berat_badan:70,catatan:'',status:'Normal'} ],
+  5:[ {id:11,tanggal:'2026-06-24',sistolik:146,diastolik:93,denyut_nadi:76,berat_badan:66,catatan:'',status:'Hipertensi Tingkat 1'} ],
+};
+let nextTekananId = 12;
+
+let chats = {
+  1:[ {id:1,pengirim:'pasien',pesan:'Selamat pagi Suster, tekanan darah saya hari ini 145/92.',created_at:'2026-07-04 08:12'},
+      {id:2,pengirim:'perawat',pesan:'Pagi Bu Siti, terima kasih sudah lapor. Coba kurangi konsumsi garam ya, dan istirahat cukup.',created_at:'2026-07-04 08:20'} ],
+  2:[ {id:3,pengirim:'pasien',pesan:'Suster, kepala saya pusing sejak semalam.',created_at:'2026-07-03 19:40'},
+      {id:4,pengirim:'perawat',pesan:'Baik Pak Ahmad, mohon cek tekanan darah dulu dan hindari aktivitas berat. Saya jadwalkan kontrol besok.',created_at:'2026-07-03 19:55'},
+      {id:5,pengirim:'pasien',pesan:'Baik Suster, terima kasih.',created_at:'2026-07-03 20:01'} ],
+  3:[ {id:6,pengirim:'pasien',pesan:'Suster, boleh minta saran menu makan sehat?',created_at:'2026-07-02 10:05'} ],
+};
+const patientPhoto = (id) => `https://i.pravatar.cc/150?u=patient${id}`;
+
+let edukasi = [
+  {id:1, judul:'Mengenal Hipertensi dan Faktor Risikonya', ringkasan:'Pahami apa itu hipertensi, penyebab, dan siapa saja yang berisiko tinggi.', thumbnail:'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=200', kategori:'Pengertian', penulis:'Ns. Fitriani, S.Kep', sumber:'Kemenkes RI', waktu_baca:5, is_published:1},
+  {id:2, judul:'Diet Rendah Garam untuk Penderita Hipertensi', ringkasan:'Panduan pola makan sehat guna menjaga tekanan darah tetap terkendali.', thumbnail:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=200', kategori:'Nutrisi', penulis:'Ns. Fitriani, S.Kep', sumber:'WHO', waktu_baca:7, is_published:1},
+  {id:3, judul:'Olahraga Aman bagi Penderita Tekanan Darah Tinggi', ringkasan:'Jenis aktivitas fisik yang direkomendasikan dan yang perlu dihindari.', thumbnail:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200', kategori:'Gaya Hidup', penulis:'Ns. Fitriani, S.Kep', sumber:'Mayo Clinic', waktu_baca:4, is_published:0},
+];
+let nextEdukasiId = 4;
+const TRUSTED_SOURCES = ['WHO','Kemenkes RI','SATUSEHAT','Mayo Clinic','Cleveland Clinic','CDC','NHS','Halodoc','Alodokter'];
+const KATEGORI_OPTIONS = ['Pengertian','Pengobatan','Nutrisi','Gaya Hidup','Risiko','Pemantauan','Khusus'];
+
+let notifikasi = [
+  {id:1, judul:'Pasien baru mendaftar', pesan:'Rina Marlina baru saja mendaftar sebagai pasien Anda.', waktu:'2026-07-05 09:12', dibaca:false},
+  {id:2, judul:'Tekanan darah tinggi terdeteksi', pesan:'Ahmad Fauzi mencatat tekanan darah 172/108 mmHg.', waktu:'2026-07-04 19:30', dibaca:false},
+  {id:3, judul:'Pesan konsultasi baru', pesan:'Siti Rahayu mengirim pesan baru di ruang konsultasi.', waktu:'2026-07-04 08:12', dibaca:true},
+];
+
+let aktivitas = [
+  {id:1, nama:'Ns. Fitriani', deskripsi:'menambahkan konten edukasi "Diet Rendah Garam".'},
+  {id:2, nama:'Siti Rahayu', deskripsi:'mencatat pemeriksaan tekanan darah baru.'},
+  {id:3, nama:'Ns. Fitriani', deskripsi:'membalas konsultasi dari Ahmad Fauzi.'},
+  {id:4, nama:'Dewi Lestari', deskripsi:'memperbarui profil pasien.'},
+  {id:5, nama:'Ns. Fitriani', deskripsi:'menambahkan pasien baru: Rina Marlina.'},
+  {id:6, nama:'Bambang Wijaya', deskripsi:'mencatat pemeriksaan tekanan darah baru.'},
+];
+
+let riwayatLogin = [
+  {id:1, waktu:'2026-07-06 07:45', device:'Chrome · Windows', ip:'103.10.22.14'},
+  {id:2, waktu:'2026-07-05 08:02', device:'Chrome · Windows', ip:'103.10.22.14'},
+  {id:3, waktu:'2026-07-04 07:58', device:'Safari · iPhone', ip:'103.10.22.55'},
+];
+
+/* ============================= APP STATE ============================= */
+let state = { loggedIn:false, route:'login', sidebarOpen:false, activePasienId:null, charts:{} };
+
+function nowStr(){ const d=new Date(); return d.toISOString().slice(0,16).replace('T',' '); }
+function destroyCharts(){ Object.values(state.charts).forEach(c=>c && c.destroy()); state.charts={}; }
+
+function toast(msg, type='success'){
+  const el = document.createElement('div');
+  const colors = { success:'#22A559', error:'#E53E3E', info:'#F4A300' };
+  el.className = 'hc-toast';
+  el.style.background = colors[type] || colors.success;
+  el.innerHTML = `<i class="fa-solid ${type==='error'?'fa-circle-exclamation':'fa-circle-check'}"></i><span>${msg}</span>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2600);
+}
+
+function badgeCls(s){
+  if (!s) return 'badge-normal';
+  if (s.includes('Tingkat 2')) return 'badge-tk2';
+  if (s.includes('Tingkat 1')) return 'badge-tk1';
+  if (s.includes('Pra')) return 'badge-pra';
+  return 'badge-normal';
+}
+function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return dt.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+
+/* ============================= ROUTER ============================= */
+function go(route){ state.route = route; state.sidebarOpen=false; render(); window.scrollTo({top:0}); }
+
+function doLogin(email, password){
+  const found = nurses.find(n => n.email === email.trim().toLowerCase() && n.password === password);
+  if (found){
+    currentNurse = found;
+    state.loggedIn = true;
+    toast(`Login berhasil! Selamat datang, ${found.nama}.`,'success');
+    go('dashboard');
+  } else {
+    toast('Email atau password salah.','error');
+  }
+}
+function doLogout(){
+  state.loggedIn = false;
+  currentNurse = null;
+  toast('Logout berhasil.','success');
+  go('login');
+}
+
+/* ============================= SIDEBAR MENU ============================= */
+const perawatMenu = [
+  { key:'dashboard',   icon:'fa-gauge-high',        label:'Dashboard' },
+  { key:'datapasien',  icon:'fa-users',             label:'Data Pasien' },
+  { key:'monitoring',  icon:'fa-chart-line',        label:'Monitoring Pasien' },
+  { key:'statistik',   icon:'fa-chart-pie',         label:'Dashboard Statistik' },
+  { key:'chatperawat', icon:'fa-comments',          label:'Konsultasi' },
+  { key:'edukasi',     icon:'fa-book-medical',      label:'Kelola Edukasi' },
+  { key:'profil',      icon:'fa-user-nurse',        label:'Profil' },
+  { key:'notifikasi',  icon:'fa-bell',              label:'Notifikasi' },
+  { key:'aktivitas',   icon:'fa-list-check',        label:'Aktivitas Terbaru' },
+  { key:'riwayat-login', icon:'fa-right-to-bracket',label:'Riwayat Login' },
+];
+
+function sidebarHtml(active){
+  return `
+  ${state.sidebarOpen ? `<div class="fixed inset-0 z-40 lg:hidden bg-black/20" onclick="state.sidebarOpen=false; render();"></div>` : ''}
+  <aside class="sidebar-mobile w-[260px] bg-white border-r border-[#F1EDE3] min-h-screen px-4 py-6 flex flex-col${state.sidebarOpen ? ' open' : ''}">
+    <a href="#" onclick="go('dashboard'); return false;" class="flex items-center gap-2 px-2 mb-8">
+      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-display font-bold text-lg">H</div>
+      <span class="font-display font-bold text-lg">HyperCare</span>
+    </a>
+    <nav class="flex flex-col gap-1 flex-1">
+      ${perawatMenu.map(m => `
+        <a href="#" onclick="go('${m.key}'); return false;" class="sidebar-link${active===m.key ? ' active':''}">
+          <i class="fa-solid ${m.icon} w-5 text-center"></i><span>${m.label}</span>
+        </a>`).join('')}
+    </nav>
+    <a href="#" onclick="doLogout(); return false;" class="sidebar-link text-[#C53030] mt-4 w-full text-left">
+      <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i><span>Logout</span>
+    </a>
+  </aside>`;
+}
+
+function topbarHtml(){
+  const unread = notifikasi.filter(n=>!n.dibaca).length;
+  const photo = currentNurse.foto || `https://i.pravatar.cc/150?u=nursefallback`;
+  return `
+  <header class="flex items-center justify-between bg-white border-b border-[#F1EDE3] px-5 md:px-8 h-[72px] sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <button class="lg:hidden text-xl text-[var(--text)]" onclick="state.sidebarOpen=!state.sidebarOpen; render();"><i class="fa-solid fa-bars"></i></button>
+      <div>
+        <p class="text-xs text-[#94A3B8]">Selamat datang,</p>
+        <p class="font-semibold leading-tight">${currentNurse.nama} <span class="ml-1">👋</span></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#" onclick="go('notifikasi'); return false;" class="relative text-[#475569] text-lg">
+        <i class="fa-regular fa-bell"></i>
+        ${unread>0 ? `<span class="absolute -top-1 -right-1 min-w-[16px] h-4 bg-primary rounded-full text-white text-[9px] flex items-center justify-center px-0.5">${unread>9?'9+':unread}</span>` : ''}
+      </a>
+      <div class="flex items-center gap-2">
+        <img src="${photo}" class="w-9 h-9 rounded-full object-cover border-2 border-primary" alt="${currentNurse.nama}"/>
+        <div class="hidden md:block leading-tight">
+          <p class="text-sm font-medium">${currentNurse.nama}</p>
+          <p class="text-xs text-[#94A3B8]">Perawat</p>
         </div>
-        <!-- chat window -->
-        <div class="flex-1 flex flex-col">
-          <div class="flex items-center gap-3 p-4 border-b border-[#F1EDE3]">
-            <img src="https://i.pravatar.cc/150?img=47" class="w-10 h-10 rounded-full object-cover" id="hc-chat-photo">
-            <div>
-              <p class="font-medium text-sm" id="hc-chat-name">Ns. Siti Aisyah, S.Kep</p>
-              <p class="text-xs text-[#22A559]"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
-            </div>
+      </div>
+    </div>
+  </header>`;
+}
+
+function layout(active, contentHtml){
+  return `
+  <div class="flex">
+    ${sidebarHtml(active)}
+    <div class="flex-1 min-w-0">
+      ${topbarHtml()}
+      ${contentHtml}
+    </div>
+  </div>`;
+}
+
+/* ============================= PAGE: LOGIN ============================= */
+function renderLogin(){
+  return `
+  <div class="font-body bg-secondary min-h-screen flex items-center justify-center p-4">
+    <div class="card-soft w-full max-w-md p-8 page-transition">
+      <div class="text-center mb-7">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-display font-bold text-lg">H</div>
+          <span class="font-display font-bold text-lg">HyperCare</span>
+        </div>
+        <h1 class="font-display font-bold text-xl">Masuk sebagai Perawat</h1>
+        <p class="text-sm text-[#64748B] mt-1">Layani pasien Anda dengan lebih baik</p>
+      </div>
+      <form onsubmit="doLogin(document.getElementById('lp-email').value, document.getElementById('lp-pass').value); return false;" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Email</label>
+          <input id="lp-email" type="email" class="input-soft" placeholder="masukan email Anda" autocomplete="email" value="perawat1@gmail.com"/>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Password</label>
+          <div class="relative">
+            <input id="lp-pass" type="password" class="input-soft pr-10" placeholder="masukan password" autocomplete="current-password" value="123456"/>
+            <i class="fa-regular fa-eye absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] cursor-pointer"
+              onclick="const i=document.getElementById('lp-pass'); i.type = i.type==='password'?'text':'password'; this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash');"></i>
           </div>
-          <div id="hc-chat-body" class="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-4 bg-[#FFFDF8]"></div>
-          <form id="hc-chat-form" class="p-4 border-t border-[#F1EDE3] flex gap-2">
-            <input id="hc-chat-input" class="input-soft" placeholder="Tulis pesan...">
-            <button class="btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <div class="flex items-center text-sm">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" class="w-4 h-4 accent-primary"/><span class="text-[#64748B]">Ingat saya</span>
+          </label>
+        </div>
+        <button type="submit" class="btn-primary w-full">Masuk</button>
+      </form>
+      <div class="text-center text-xs text-[#94A3B8] mt-4 bg-secondary rounded-lg py-2 px-3 space-y-1">
+        <p class="font-semibold text-[#64748B]">2 Akun Demo Perawat:</p>
+        <p>perawat1@gmail.com / 123456 — Ns. Siti Aisyah</p>
+        <p>perawat2@gmail.com / 123456 — Ns. Rina Amelia</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================= PAGE: DASHBOARD ============================= */
+function renderDashboard(){
+  const totalPasien = patients.length;
+  const totalPemeriksaan = Object.values(tekanan).reduce((a,r)=>a+r.length,0);
+  let normal=0, pra=0, tk1=0, tk2=0;
+  Object.values(tekanan).flat().forEach(r=>{
+    if (r.status.includes('Tingkat 2')) tk2++;
+    else if (r.status.includes('Tingkat 1')) tk1++;
+    else if (r.status.includes('Pra')) pra++;
+    else normal++;
+  });
+  const chatList = Object.keys(chats).map(pid=>{
+    const p = patients.find(x=>x.id==pid);
+    const msgs = chats[pid];
+    const last = msgs[msgs.length-1];
+    const belum = msgs.filter(m=>m.pengirim==='pasien').length % 3; // demo unread count
+    return p ? { pasien_id:p.id, pasien_nama:p.nama, pesan_terakhir:last?.pesan, belum_dibaca: belum } : null;
+  }).filter(Boolean);
+
+  const content = `
+  <main class="p-5 md:p-8 space-y-6 page-transition">
+    <p class="text-[#64748B] text-sm">Selamat datang, <strong>${currentNurse.nama}</strong>. Pantau dan layani pasien Anda.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Total Pasien</p><p class="font-display font-bold text-2xl">${totalPasien}</p><p class="text-xs text-[#94A3B8] mt-2">Pasien terdaftar</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Total Pemeriksaan</p><p class="font-display font-bold text-2xl">${totalPemeriksaan}</p><p class="text-xs text-[#94A3B8] mt-2">Rekaman tekanan darah</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Konsultasi Aktif</p><p class="font-display font-bold text-2xl">${chatList.length}</p><p class="text-xs text-[#94A3B8] mt-2">Percakapan berjalan</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Pasien Berisiko Tinggi</p><p class="font-display font-bold text-2xl text-[#C53030]">${tk2}</p><p class="text-xs text-[#94A3B8] mt-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Hipertensi Tk.2</p></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="card-soft p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Distribusi Status Risiko</h3>
+          <a href="#" onclick="go('statistik'); return false;" class="text-xs text-primary hover:underline">Detail</a>
+        </div>
+        <canvas id="chartDashDonut" height="220"></canvas>
+      </div>
+      <div class="card-soft p-5 lg:col-span-2">
+        <h3 class="font-semibold mb-4">Konsultasi Terbaru</h3>
+        <div class="space-y-3">
+          ${chatList.map(k=>`
+            <div class="flex items-center justify-between p-3 rounded-xl hover:bg-secondary/60">
+              <div class="flex items-center gap-3">
+                <img src="${patientPhoto(k.pasien_id)}" class="w-10 h-10 rounded-full object-cover" alt="${k.pasien_nama}"/>
+                <div><p class="text-sm font-medium">${k.pasien_nama}</p><p class="text-xs text-[#94A3B8] truncate max-w-[200px]">${k.pesan_terakhir||'Belum ada pesan'}</p></div>
+              </div>
+              ${k.belum_dibaca>0 ? `<span class="bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">${k.belum_dibaca}</span>`:''}
+            </div>`).join('') || `<p class="text-sm text-[#94A3B8] py-4 text-center">Belum ada konsultasi.</p>`}
+        </div>
+        <a href="#" onclick="go('chatperawat'); return false;" class="block text-center btn-outline mt-4 text-sm">Lihat Semua Konsultasi</a>
+      </div>
+    </div>
+    <div class="card-soft p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold">Aktivitas Terbaru</h3>
+        <a href="#" onclick="go('aktivitas'); return false;" class="text-xs text-primary hover:underline">Lihat semua</a>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
+        ${aktivitas.slice(0,6).map(a=>`
+          <div class="flex items-center gap-2.5 text-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+            <span class="text-[#64748B] truncate"><strong class="text-[#1E293B] font-medium">${a.nama}</strong> ${a.deskripsi}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+  </main>`;
+
+  setTimeout(()=>{
+    destroyCharts();
+    const ctx = document.getElementById('chartDashDonut');
+    if (ctx) state.charts.dashDonut = new Chart(ctx, {
+      type:'doughnut',
+      data:{ labels:['Normal','Pra Hipertensi','Hipertensi Tk.1','Hipertensi Tk.2'],
+        datasets:[{ data:[normal,pra,tk1,tk2], backgroundColor:['#22A559','#F4A300','#F97316','#E53E3E'], borderWidth:0 }] },
+      options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{ size:11 } } } }, cutout:'68%' },
+    });
+  },0);
+
+  return layout('dashboard', content);
+}
+
+/* ============================= PAGE: DATA PASIEN ============================= */
+let dpSearch = '';
+let dpModal = false; // 'add'|'edit'|'detail'|false
+let dpSelected = null;
+let dpForm = {};
+
+function dpEmptyForm(){ return { nama:'', email:'', no_hp:'', jenis_kelamin:'Laki-laki', umur:'', alamat:'' }; }
+
+function renderDataPasien(){
+  const list = patients.filter(p => p.nama.toLowerCase().includes(dpSearch.toLowerCase()) || p.email.toLowerCase().includes(dpSearch.toLowerCase()));
+
+  const rows = list.map(p=>`
+    <tr class="border-b border-[#F8F5EC]">
+      <td class="py-3"><div class="flex items-center gap-2"><img src="${patientPhoto(p.id)}" class="w-8 h-8 rounded-full object-cover" alt="${p.nama}"/><span class="font-medium">${p.nama}</span></div></td>
+      <td>${p.umur ? p.umur+' th' : '-'}</td>
+      <td>${p.jenis_kelamin || '-'}</td>
+      <td>${p.no_hp || '-'}</td>
+      <td><span class="badge-status ${badgeCls(p.status_terakhir)}">${p.status_terakhir || 'Belum ada data'}</span></td>
+      <td>
+        <div class="flex gap-1.5 py-1 flex-wrap">
+          <button onclick="dpOpenDetail(${p.id})" class="text-xs btn-outline px-2 py-1">Detail</button>
+          <button onclick="dpOpenEdit(${p.id})" class="text-xs btn-outline px-2 py-1"><i class="fa-solid fa-pen"></i></button>
+          <a href="#" onclick="monPasienId=${p.id}; go('monitoring'); return false;" class="text-xs btn-primary px-2 py-1">Monitor</a>
+          <button onclick="dpDelete(${p.id})" class="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="6" class="py-8 text-center text-[#94A3B8]">Tidak ada data pasien.</td></tr>`;
+
+  const modalHtml = dpModal==='add' || dpModal==='edit' ? `
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onclick="dpCloseModal()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">${dpModal==='add' ? 'Tambah Pasien Baru' : 'Edit Data Pasien'}</h3>
+            <button onclick="dpCloseModal()" class="text-[#94A3B8] hover:text-[#475569]"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+          <form onsubmit="dpSave(event)" class="space-y-4">
+            <div><label class="text-sm font-medium block mb-1">Nama Lengkap</label><input id="dpf-nama" class="input-soft" value="${dpForm.nama||''}" required/></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="text-sm font-medium block mb-1">Email</label><input id="dpf-email" type="email" class="input-soft" value="${dpForm.email||''}" required/></div>
+              <div><label class="text-sm font-medium block mb-1">Nomor HP</label><input id="dpf-hp" class="input-soft" value="${dpForm.no_hp||''}"/></div>
+              <div><label class="text-sm font-medium block mb-1">Umur</label><input id="dpf-umur" type="number" class="input-soft" value="${dpForm.umur||''}"/></div>
+              <div><label class="text-sm font-medium block mb-1">Jenis Kelamin</label>
+                <select id="dpf-jk" class="input-soft"><option ${dpForm.jenis_kelamin==='Laki-laki'?'selected':''}>Laki-laki</option><option ${dpForm.jenis_kelamin==='Perempuan'?'selected':''}>Perempuan</option></select></div>
+            </div>
+            <div><label class="text-sm font-medium block mb-1">Alamat</label><textarea id="dpf-alamat" class="input-soft" rows="2">${dpForm.alamat||''}</textarea></div>
+            <div class="flex gap-2 pt-1">
+              <button type="submit" class="btn-primary flex-1">Simpan</button>
+              <button type="button" onclick="dpCloseModal()" class="btn-outline px-4">Batal</button>
+            </div>
           </form>
         </div>
       </div>
-    </main>
-  </div>
-</div>
-<script src="assets/js/data.js"></script>
-<script src="assets/js/components.js"></script>
-<script>
-const nurseListEl = document.getElementById('hc-nurse-list');
-HC_NURSES.forEach((n,i) => {
-  nurseListEl.insertAdjacentHTML('beforeend', `
-    <button class="w-full flex items-center gap-3 p-3 hover:bg-secondary text-left ${i===0?'bg-secondary':''}" onclick="hcSwitchNurse(${i}, this)">
-      <img src="${n.photo}" class="w-11 h-11 rounded-full object-cover">
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium truncate">${n.name}</p>
-        <p class="text-xs text-[#94A3B8] truncate">${n.online?'Online':'Offline'} · ${n.spec}</p>
-      </div>
-    </button>`);
-});
+    </div>` : '';
 
-const chatBody = document.getElementById('hc-chat-body');
-const histories = HC_NURSES.map(n => ([
-  { from:'them', text:`Halo, saya ${n.name.split(',')[0]}. Bagaimana kondisi tekanan darah Anda hari ini?`, time:'09:30' },
-  { from:'me', text:'Pagi, tekanan darah saya tadi pagi 120/80, terasa cukup baik.', time:'09:32' },
-  { from:'them', text:'Bagus sekali, tetap pertahankan pola makan rendah garam dan rutin berolahraga ringan ya 🙂', time:'09:33' },
-]));
-
-function renderChat(idx){
-  chatBody.innerHTML = '';
-  histories[idx].forEach(m => {
-    chatBody.insertAdjacentHTML('beforeend', `
-      <div class="flex ${m.from==='me'?'justify-end':'justify-start'}">
-        <div class="max-w-[75%] ${m.from==='me'?'chat-bubble-me':'chat-bubble-other'} px-4 py-2 text-sm">
-          ${m.text}
-          <div class="text-[10px] opacity-70 mt-1 text-right">${m.time}</div>
+  const detailHtml = dpModal==='detail' && dpSelected ? `
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onclick="dpCloseModal()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" onclick="event.stopPropagation()">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">Detail Pasien</h3>
+            <button onclick="dpCloseModal()"><i class="fa-solid fa-xmark text-lg text-[#94A3B8]"></i></button>
+          </div>
+          <div class="flex items-center gap-3 mb-4">
+            <img src="${patientPhoto(dpSelected.id)}" class="w-16 h-16 rounded-full object-cover" alt="${dpSelected.nama}"/>
+            <div><p class="font-semibold">${dpSelected.nama}</p><p class="text-xs text-[#94A3B8]">${dpSelected.email}</p>
+              <span class="badge-status ${badgeCls(dpSelected.status_terakhir)} mt-1">${dpSelected.status_terakhir||'Belum ada data'}</span></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div><p class="text-[#94A3B8] text-xs">Umur</p><p class="font-medium">${dpSelected.umur? dpSelected.umur+' tahun':'-'}</p></div>
+            <div><p class="text-[#94A3B8] text-xs">Jenis Kelamin</p><p class="font-medium">${dpSelected.jenis_kelamin||'-'}</p></div>
+            <div><p class="text-[#94A3B8] text-xs">No. HP</p><p class="font-medium">${dpSelected.no_hp||'-'}</p></div>
+            <div><p class="text-[#94A3B8] text-xs">Alamat</p><p class="font-medium">${dpSelected.alamat||'-'}</p></div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <a href="#" onclick="monPasienId=${dpSelected.id}; dpCloseModal(); go('monitoring'); return false;" class="btn-primary flex-1 text-center text-sm">Monitoring</a>
+            <button onclick="dpOpenEdit(${dpSelected.id})" class="btn-outline text-sm px-4">Edit</button>
+          </div>
         </div>
-      </div>`);
-  });
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-function hcSwitchNurse(i, el){
-  const n = HC_NURSES[i];
-  document.getElementById('hc-chat-name').textContent = n.name;
-  document.getElementById('hc-chat-photo').src = n.photo;
-  nurseListEl.querySelectorAll('button').forEach(b => b.classList.remove('bg-secondary'));
-  el.classList.add('bg-secondary');
-  renderChat(i);
-  window.hcCurrentNurse = i;
-}
-window.hcCurrentNurse = 0;
-renderChat(0);
+      </div>
+    </div>` : '';
 
-document.getElementById('hc-chat-form').addEventListener('submit', function(e){
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="card-soft p-6">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <h3 class="font-semibold">Data Pasien <span class="text-[#94A3B8] font-normal text-sm">(${list.length})</span></h3>
+        <div class="flex gap-3 flex-wrap">
+          <input class="input-soft max-w-xs text-sm" placeholder="Cari nama / email..." value="${dpSearch}" oninput="dpSearch=this.value; render();"/>
+          <button onclick="dpOpenAdd()" class="btn-primary text-sm"><i class="fa-solid fa-plus mr-1"></i>Tambah Pasien</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]"><th class="py-2">Nama</th><th>Umur</th><th>Jenis Kelamin</th><th>Nomor HP</th><th>Status Terakhir</th><th>Aksi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  ${modalHtml}${detailHtml}`;
+
+  return layout('datapasien', content);
+}
+function dpOpenAdd(){ dpForm = dpEmptyForm(); dpSelected=null; dpModal='add'; render(); }
+function dpOpenEdit(id){ const p = patients.find(x=>x.id===id); dpSelected=p; dpForm = {...p}; dpModal='edit'; render(); }
+function dpOpenDetail(id){ dpSelected = patients.find(x=>x.id===id); dpModal='detail'; render(); }
+function dpCloseModal(){ dpModal=false; dpSelected=null; render(); }
+function dpSave(e){
   e.preventDefault();
-  const input = document.getElementById('hc-chat-input');
-  if(!input.value.trim()) return;
-  const time = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-  histories[window.hcCurrentNurse].push({from:'me', text:input.value, time});
-  renderChat(window.hcCurrentNurse);
-  input.value='';
+  const data = {
+    nama: document.getElementById('dpf-nama').value,
+    email: document.getElementById('dpf-email').value,
+    no_hp: document.getElementById('dpf-hp').value,
+    umur: parseInt(document.getElementById('dpf-umur').value)||'',
+    jenis_kelamin: document.getElementById('dpf-jk').value,
+    alamat: document.getElementById('dpf-alamat').value,
+  };
+  if (dpModal==='add'){
+    patients.push({ id: nextPatientId++, status_terakhir:'Belum ada data', foto:null, ...data });
+    toast('Pasien berhasil ditambahkan.','success');
+  } else {
+    const idx = patients.findIndex(p=>p.id===dpSelected.id);
+    patients[idx] = { ...patients[idx], ...data };
+    toast('Data pasien diperbarui.','success');
+  }
+  dpModal=false; dpSelected=null; render();
+}
+function dpDelete(id){
+  const p = patients.find(x=>x.id===id);
+  if (!confirm(`Hapus pasien "${p.nama}"? Semua data terkait akan ikut terhapus.`)) return;
+  patients = patients.filter(x=>x.id!==id);
+  delete tekanan[id]; delete chats[id];
+  toast('Pasien dihapus.','success');
+  render();
+}
+
+/* ============================= PAGE: MONITORING PASIEN ============================= */
+let monPasienId = null;
+let monForm = {}; let monEditId = null; let monShowForm = false;
+function monEmptyForm(){ return { tanggal:'', sistolik:'', diastolik:'', denyut_nadi:'', berat_badan:'', catatan:'' }; }
+
+function classifyStatus(sis, dia){
+  if (sis>=160 || dia>=100) return 'Hipertensi Tingkat 2';
+  if (sis>=140 || dia>=90) return 'Hipertensi Tingkat 1';
+  if (sis>=130 || dia>=85) return 'Pra Hipertensi';
+  return 'Normal';
+}
+
+function renderMonitoring(){
+  if (!monPasienId){
+    const content = `
+    <main class="p-5 md:p-8 page-transition">
+      <div class="card-soft p-8 text-center">
+        <p class="text-[#94A3B8] mb-4">Pilih pasien dari halaman Data Pasien untuk melihat monitoring.</p>
+        <button onclick="go('datapasien')" class="btn-primary">Ke Data Pasien</button>
+      </div>
+    </main>`;
+    return layout('monitoring', content);
+  }
+  const pasien = patients.find(p=>p.id===monPasienId);
+  const rows = (tekanan[monPasienId]||[]).slice().sort((a,b)=>a.tanggal<b.tanggal?1:-1);
+  const total = rows.length;
+  const avgS = total? Math.round(rows.reduce((a,r)=>a+r.sistolik,0)/total) : '—';
+  const avgD = total? Math.round(rows.reduce((a,r)=>a+r.diastolik,0)/total) : '—';
+  const maxS = total? Math.max(...rows.map(r=>r.sistolik)) : '—';
+  const statusTerakhir = total ? rows[0].status : 'Belum ada data';
+  const umurLabel = pasien.umur ? pasien.umur+' Tahun' : '';
+
+  const formHtml = monShowForm ? `
+  <form onsubmit="monSave(event)" class="card-soft p-5 grid sm:grid-cols-3 gap-4">
+    <div><label class="text-sm font-medium block mb-1">Tanggal</label><input id="mf-tanggal" type="date" class="input-soft" value="${monForm.tanggal||''}" required/></div>
+    <div><label class="text-sm font-medium block mb-1">Sistolik</label><input id="mf-sis" type="number" class="input-soft" placeholder="120" value="${monForm.sistolik||''}" required/></div>
+    <div><label class="text-sm font-medium block mb-1">Diastolik</label><input id="mf-dia" type="number" class="input-soft" placeholder="80" value="${monForm.diastolik||''}" required/></div>
+    <div><label class="text-sm font-medium block mb-1">Denyut Nadi</label><input id="mf-nadi" type="number" class="input-soft" placeholder="72" value="${monForm.denyut_nadi||''}"/></div>
+    <div><label class="text-sm font-medium block mb-1">Berat Badan (kg)</label><input id="mf-bb" type="number" step="0.1" class="input-soft" placeholder="65" value="${monForm.berat_badan||''}"/></div>
+    <div><label class="text-sm font-medium block mb-1">Catatan</label><input id="mf-catatan" class="input-soft" placeholder="Keterangan..." value="${monForm.catatan||''}"/></div>
+    <div class="sm:col-span-3 flex gap-2">
+      <button type="submit" class="btn-primary">${monEditId ? 'Perbarui':'Simpan Pemeriksaan'}</button>
+      ${monEditId ? `<button type="button" onclick="monEditId=null; monForm=monEmptyForm(); render();" class="btn-outline px-4">Batal</button>`:''}
+    </div>
+  </form>` : '';
+
+  const tableRows = rows.map(d=>`
+    <tr class="border-b border-[#F8F5EC]">
+      <td class="py-3">${d.tanggal}</td>
+      <td>${d.sistolik}/${d.diastolik} mmHg</td>
+      <td>${d.denyut_nadi||'-'}</td>
+      <td>${d.berat_badan? d.berat_badan+' kg':'-'}</td>
+      <td class="max-w-[120px] truncate text-[#64748B]">${d.catatan||'-'}</td>
+      <td><span class="badge-status ${badgeCls(d.status)}">${d.status||'Normal'}</span></td>
+      <td><div class="flex gap-1 py-1">
+        <button onclick="monEdit(${d.id})" class="text-xs btn-outline px-2 py-1"><i class="fa-solid fa-pen"></i></button>
+        <button onclick="monDelete(${d.id})" class="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('') || `<tr><td colspan="7" class="py-8 text-center text-[#94A3B8]">Belum ada data pemeriksaan.</td></tr>`;
+
+  const content = `
+  <main class="p-5 md:p-8 space-y-6 page-transition">
+    <div class="card-soft p-5 flex items-center gap-4 flex-wrap">
+      <img src="${patientPhoto(pasien.id)}" class="w-16 h-16 rounded-full object-cover border-4 border-secondary" alt="${pasien.nama}"/>
+      <div class="flex-1">
+        <h3 class="font-semibold">${pasien.nama}</h3>
+        <p class="text-xs text-[#94A3B8]">${umurLabel} · ${pasien.jenis_kelamin||'-'} · ${pasien.no_hp||'-'}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="badge-status ${badgeCls(statusTerakhir)}">Status: ${statusTerakhir}</span>
+        <button onclick="monShowForm=!monShowForm; monEditId=null; monForm=monEmptyForm(); render();" class="btn-primary text-sm">
+          <i class="fa-solid ${monShowForm?'fa-xmark':'fa-plus'} mr-1"></i>${monShowForm?'Tutup':'Tambah Pemeriksaan'}
+        </button>
+      </div>
+    </div>
+    ${formHtml}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="card-soft p-5 lg:col-span-2">
+        <h3 class="font-semibold mb-4">Grafik Tekanan Darah</h3>
+        ${rows.length ? `<canvas id="chartMon" height="140"></canvas>` : `<p class="text-sm text-[#94A3B8] text-center py-8">Belum ada data pemeriksaan.</p>`}
+      </div>
+      <div class="card-soft p-5">
+        <h3 class="font-semibold mb-4">Ringkasan Statistik</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between"><span class="text-[#94A3B8]">Total Pemeriksaan</span><span class="font-semibold">${total}</span></div>
+          <div class="flex justify-between"><span class="text-[#94A3B8]">Rata-rata Sistolik</span><span class="font-semibold">${avgS} mmHg</span></div>
+          <div class="flex justify-between"><span class="text-[#94A3B8]">Rata-rata Diastolik</span><span class="font-semibold">${avgD} mmHg</span></div>
+          <div class="flex justify-between"><span class="text-[#94A3B8]">Tertinggi</span><span class="font-semibold">${maxS} mmHg</span></div>
+          <hr class="border-[#F1EDE3]"/>
+          <div class="space-y-2">
+            ${[['Normal','< 130/85','badge-normal'],['Pra Hipertensi','130-139/85-89','badge-pra'],['Hipertensi Tk.1','140-159/90-99','badge-tk1'],['Hipertensi Tk.2','≥ 160/100','badge-tk2']]
+              .map(([l,r,c])=>`<div class="flex items-center justify-between"><span class="badge-status ${c}">${l}</span><span class="text-[#94A3B8] text-xs">${r}</span></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-soft p-5">
+      <h3 class="font-semibold mb-4">Riwayat Pemeriksaan</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]"><th class="py-2">Tanggal</th><th>Tekanan Darah</th><th>Nadi</th><th>Berat</th><th>Catatan</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>
+  </main>`;
+
   setTimeout(()=>{
-    histories[window.hcCurrentNurse].push({from:'them', text:'Baik, terima kasih informasinya. Saya catat ya 📝', time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
-    renderChat(window.hcCurrentNurse);
-  }, 900);
-});
+    destroyCharts();
+    const ctx = document.getElementById('chartMon');
+    if (ctx){
+      const rev = rows.slice().reverse().slice(-10);
+      state.charts.mon = new Chart(ctx, {
+        type:'line',
+        data:{ labels: rev.map(d=>d.tanggal),
+          datasets:[
+            { label:'Sistolik', data:rev.map(d=>d.sistolik), borderColor:'#F4A300', backgroundColor:'#F4A30022', tension:.4, fill:true },
+            { label:'Diastolik', data:rev.map(d=>d.diastolik), borderColor:'#94A3B8', backgroundColor:'#94A3B822', tension:.4, fill:true },
+          ] },
+        options:{ scales:{ y:{ suggestedMin:60, suggestedMax:180 } } },
+      });
+    }
+  },0);
+
+  return layout('monitoring', content);
+}
+function monEdit(id){
+  const row = tekanan[monPasienId].find(r=>r.id===id);
+  monEditId = id; monForm = {...row}; monShowForm = true; render();
+}
+function monDelete(id){
+  if (!confirm('Hapus data pemeriksaan ini?')) return;
+  tekanan[monPasienId] = tekanan[monPasienId].filter(r=>r.id!==id);
+  toast('Dihapus.','success'); render();
+}
+function monSave(e){
+  e.preventDefault();
+  const sis = parseInt(document.getElementById('mf-sis').value);
+  const dia = parseInt(document.getElementById('mf-dia').value);
+  const data = {
+    tanggal: document.getElementById('mf-tanggal').value,
+    sistolik: sis, diastolik: dia,
+    denyut_nadi: parseInt(document.getElementById('mf-nadi').value)||'',
+    berat_badan: parseFloat(document.getElementById('mf-bb').value)||'',
+    catatan: document.getElementById('mf-catatan').value,
+    status: classifyStatus(sis, dia),
+  };
+  if (!tekanan[monPasienId]) tekanan[monPasienId]=[];
+  if (monEditId){
+    const idx = tekanan[monPasienId].findIndex(r=>r.id===monEditId);
+    tekanan[monPasienId][idx] = { ...tekanan[monPasienId][idx], ...data };
+    toast('Data diperbarui.','success');
+  } else {
+    tekanan[monPasienId].push({ id: nextTekananId++, ...data });
+    toast('Pemeriksaan berhasil dicatat.','success');
+  }
+  const p = patients.find(x=>x.id===monPasienId);
+  if (p) p.status_terakhir = data.status;
+  monShowForm=false; monEditId=null; monForm=monEmptyForm(); render();
+}
+
+/* ============================= PAGE: STATISTIK ============================= */
+function renderStatistik(){
+  const all = Object.values(tekanan).flat();
+  let normal=0, pra=0, tk1=0, tk2=0;
+  all.forEach(r=>{
+    if (r.status.includes('Tingkat 2')) tk2++;
+    else if (r.status.includes('Tingkat 1')) tk1++;
+    else if (r.status.includes('Pra')) pra++;
+    else normal++;
+  });
+  const content = `
+  <main class="p-5 md:p-8 space-y-6 page-transition">
+    <div class="flex items-center justify-between">
+      <p class="text-[#64748B] text-sm">Ringkasan statistik kesehatan seluruh pasien HyperCare.</p>
+      <button onclick="render()" class="text-xs text-primary hover:underline"><i class="fa-solid fa-rotate-right mr-1"></i>Segarkan</button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Total Pasien Terdaftar</p><p class="font-display font-bold text-2xl">${patients.length}</p><p class="text-xs text-[#94A3B8] mt-2">Pasien</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Total Pemeriksaan</p><p class="font-display font-bold text-2xl">${all.length}</p><p class="text-xs text-[#94A3B8] mt-2">Rekaman tekanan darah</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Status Normal</p><p class="font-display font-bold text-2xl text-[#22A559]">${normal}</p><p class="text-xs text-[#94A3B8] mt-2">Pasien terkontrol baik</p></div>
+      <div class="card-soft p-5"><p class="text-xs text-[#94A3B8] mb-1">Berisiko Tinggi</p><p class="font-display font-bold text-2xl text-[#C53030]">${tk2}</p><p class="text-xs text-[#94A3B8] mt-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Hipertensi Tingkat 2</p></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="card-soft p-5"><h3 class="font-semibold mb-4">Distribusi Status Risiko</h3><canvas id="chartStatDonut" height="220"></canvas></div>
+      <div class="card-soft p-5"><h3 class="font-semibold mb-4">Perbandingan Jumlah per Status</h3><canvas id="chartStatBar" height="220"></canvas></div>
+    </div>
+  </main>`;
+
+  setTimeout(()=>{
+    destroyCharts();
+    const c1 = document.getElementById('chartStatDonut');
+    if (c1) state.charts.statDonut = new Chart(c1, {
+      type:'doughnut',
+      data:{ labels:['Normal','Pra Hipertensi','Hipertensi Tk.1','Hipertensi Tk.2'], datasets:[{ data:[normal,pra,tk1,tk2], backgroundColor:['#22A559','#F4A300','#F97316','#E53E3E'], borderWidth:0 }] },
+      options:{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{ size:11 } } } }, cutout:'68%' },
+    });
+    const c2 = document.getElementById('chartStatBar');
+    if (c2) state.charts.statBar = new Chart(c2, {
+      type:'bar',
+      data:{ labels:['Normal','Pra Hipertensi','Hipertensi Tk.1','Hipertensi Tk.2'], datasets:[{ data:[normal,pra,tk1,tk2], backgroundColor:['#22A559','#F4A300','#F97316','#E53E3E'], borderRadius:8, maxBarThickness:50 }] },
+      options:{ plugins:{ legend:{ display:false } } },
+    });
+  },0);
+
+  return layout('statistik', content);
+}
+
+/* ============================= PAGE: CHAT PERAWAT ============================= */
+let chatSearch = '';
+function renderChatPerawat(){
+  const chatListRaw = Object.keys(chats).map(pid=>{
+    const p = patients.find(x=>x.id==pid);
+    const msgs = chats[pid];
+    const last = msgs[msgs.length-1];
+    const belum = msgs.filter(m=>m.pengirim==='pasien').length % 3;
+    return p ? { pasien_id:p.id, pasien_nama:p.nama, pesan_terakhir:last?.pesan, belum_dibaca: belum } : null;
+  }).filter(Boolean);
+  const filtered = chatListRaw.filter(c=>c.pasien_nama.toLowerCase().includes(chatSearch.toLowerCase()));
+
+  const listHtml = filtered.map(c=>`
+    <button onclick="state.activePasienId=${c.pasien_id}; render();" class="w-full flex items-center gap-3 p-3 hover:bg-secondary text-left${state.activePasienId===c.pasien_id ? ' bg-secondary':''}">
+      <img src="${patientPhoto(c.pasien_id)}" class="w-11 h-11 rounded-full object-cover" alt="${c.pasien_nama}"/>
+      <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${c.pasien_nama}</p><p class="text-xs text-[#94A3B8] truncate">${c.pesan_terakhir||'Belum ada pesan'}</p></div>
+      ${c.belum_dibaca>0 ? `<span class="bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">${c.belum_dibaca}</span>`:''}
+    </button>`).join('') || `<p class="text-sm text-[#94A3B8] p-4 text-center">Belum ada konsultasi.</p>`;
+
+  const active = patients.find(p=>p.id===state.activePasienId);
+  let chatWindow;
+  if (active){
+    const msgs = chats[active.id] || [];
+    chatWindow = `
+    <div class="flex-1 flex flex-col min-w-0">
+      <div class="flex items-center gap-3 p-4 border-b border-[#F1EDE3]">
+        <img src="${patientPhoto(active.id)}" class="w-10 h-10 rounded-full object-cover" alt=""/>
+        <div><p class="font-medium text-sm">${active.nama}</p><p class="text-xs text-[#94A3B8]">Pasien</p></div>
+      </div>
+      <div id="chatBody" class="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-4 bg-[#FFFDF8]">
+        ${msgs.length===0 ? `<p class="text-center text-sm text-[#94A3B8] mt-8">Belum ada percakapan.</p>` : msgs.map(m=>`
+          <div class="flex ${m.pengirim==='perawat' ? 'justify-end':'justify-start'}">
+            <div class="max-w-[75%] ${m.pengirim==='perawat' ? 'chat-bubble-me':'chat-bubble-other'} px-4 py-2 text-sm">
+              ${m.pesan}<div class="text-[10px] opacity-70 mt-1 text-right">${m.created_at?.slice(11,16)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <form onsubmit="chatSend(event)" class="p-4 border-t border-[#F1EDE3] flex gap-2">
+        <input id="chatMsgInput" class="input-soft flex-1" placeholder="Tulis pesan..."/>
+        <button type="submit" class="btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>`;
+  } else {
+    chatWindow = `<div class="flex-1 flex items-center justify-center text-[#94A3B8] text-sm">Pilih pasien untuk membuka percakapan.</div>`;
+  }
+
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="card-soft flex h-[calc(100vh-150px)] overflow-hidden">
+      <div class="w-[280px] border-r border-[#F1EDE3] flex-col hidden md:flex">
+        <div class="p-4 border-b border-[#F1EDE3]"><input class="input-soft text-sm" placeholder="Cari pasien..." value="${chatSearch}" oninput="chatSearch=this.value; render();"/></div>
+        <div class="overflow-y-auto scrollbar-thin flex-1">${listHtml}</div>
+      </div>
+      ${chatWindow}
+    </div>
+  </main>`;
+
+  setTimeout(()=>{ const b=document.getElementById('chatBody'); if (b) b.scrollTop=b.scrollHeight; },0);
+  return layout('chatperawat', content);
+}
+function chatSend(e){
+  e.preventDefault();
+  const input = document.getElementById('chatMsgInput');
+  const text = input.value.trim();
+  if (!text || !state.activePasienId) return;
+  if (!chats[state.activePasienId]) chats[state.activePasienId]=[];
+  chats[state.activePasienId].push({ id: Date.now(), pengirim:'perawat', pesan:text, created_at: nowStr() });
+  render();
+}
+
+/* ============================= PAGE: EDUKASI ============================= */
+let eduSearch=''; let eduModal=false; let eduEditId=null; let eduForm={};
+function eduEmptyForm(){ return { judul:'', ringkasan:'', isi:'', thumbnail:'', kategori:KATEGORI_OPTIONS[0], penulis:currentNurse.nama, sumber:TRUSTED_SOURCES[0], waktu_baca:5, url_artikel:'', url_video:'', url_reel:'', is_published:1 }; }
+
+function renderEdukasi(){
+  const filtered = edukasi.filter(e=>e.judul.toLowerCase().includes(eduSearch.toLowerCase()));
+  const rows = filtered.map(e=>`
+    <tr class="border-b border-[#F8F5EC]">
+      <td class="py-3"><img src="${e.thumbnail||'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=100'}" class="w-14 h-10 rounded-lg object-cover" alt=""/></td>
+      <td class="max-w-[220px]"><p class="font-medium truncate">${e.judul}</p><p class="text-xs text-[#94A3B8] truncate">${e.penulis}</p></td>
+      <td>${e.kategori||'-'}</td><td>${e.sumber||'-'}</td>
+      <td><button onclick="eduToggle(${e.id})" class="text-xs px-2 py-1 rounded-full font-medium ${e.is_published?'bg-green-100 text-green-600':'bg-gray-100 text-gray-500'}">${e.is_published?'Terbit':'Draft'}</button></td>
+      <td><div class="flex gap-1.5 py-1">
+        <button onclick="eduOpenEdit(${e.id})" class="text-xs btn-outline px-2 py-1"><i class="fa-solid fa-pen"></i></button>
+        <button onclick="eduDelete(${e.id})" class="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('') || `<tr><td colspan="6" class="py-8 text-center text-[#94A3B8]">Belum ada konten edukasi. Klik "Tambah Konten" untuk mulai.</td></tr>`;
+
+  const modalHtml = eduModal ? `
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onclick="eduCloseModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">${eduEditId?'Edit Konten Edukasi':'Tambah Konten Edukasi'}</h3>
+          <button onclick="eduCloseModal()" class="text-[#94A3B8] hover:text-[#475569]"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <form onsubmit="eduSave(event)" class="space-y-4">
+          <div><label class="text-sm font-medium block mb-1">Judul</label><input id="ef-judul" class="input-soft" value="${eduForm.judul||''}" required/></div>
+          <div><label class="text-sm font-medium block mb-1">Ringkasan</label><textarea id="ef-ringkasan" class="input-soft" rows="2" placeholder="Ringkasan singkat untuk card...">${eduForm.ringkasan||''}</textarea></div>
+          <div><label class="text-sm font-medium block mb-1">URL Thumbnail</label><input id="ef-thumb" class="input-soft" value="${eduForm.thumbnail||''}" placeholder="https://..."/></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-sm font-medium block mb-1">Kategori</label><select id="ef-kategori" class="input-soft">${KATEGORI_OPTIONS.map(k=>`<option ${eduForm.kategori===k?'selected':''}>${k}</option>`).join('')}</select></div>
+            <div><label class="text-sm font-medium block mb-1">Waktu Baca (menit)</label><input id="ef-waktu" type="number" min="1" max="60" class="input-soft" value="${eduForm.waktu_baca||5}"/></div>
+            <div><label class="text-sm font-medium block mb-1">Penulis</label><input id="ef-penulis" class="input-soft" value="${eduForm.penulis||currentNurse.nama}" required/></div>
+            <div><label class="text-sm font-medium block mb-1">Sumber Terpercaya</label><select id="ef-sumber" class="input-soft">${TRUSTED_SOURCES.map(s=>`<option ${eduForm.sumber===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="ef-publish" type="checkbox" ${eduForm.is_published?'checked':''} class="w-4 h-4 accent-primary"/>
+            <label for="ef-publish" class="text-sm">Terbitkan sekarang (langsung tampil ke pasien)</label>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button type="submit" class="btn-primary flex-1">Simpan &amp; Kirim</button>
+            <button type="button" onclick="eduCloseModal()" class="btn-outline px-4">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>` : '';
+
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="mb-6">
+      <h1 class="font-display font-bold text-xl md:text-2xl">Kelola Edukasi</h1>
+      <p class="text-[#64748B] text-sm mt-1">Konten yang kamu terbitkan di sini akan langsung muncul di halaman Edukasi dan Dashboard pasien.</p>
+    </div>
+    <div class="card-soft p-6">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <h2 class="font-display font-bold text-lg">Daftar Konten <span class="text-[#94A3B8] font-normal text-sm">(${edukasi.length})</span></h2>
+        <div class="flex gap-3 flex-wrap">
+          <input class="input-soft max-w-xs text-sm" placeholder="Cari judul..." value="${eduSearch}" oninput="eduSearch=this.value; render();"/>
+          <button onclick="eduOpenAdd()" class="btn-primary text-sm"><i class="fa-solid fa-plus mr-1"></i>Tambah Konten</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]"><th class="py-2">Thumbnail</th><th>Judul</th><th>Kategori</th><th>Sumber</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </main>${modalHtml}`;
+
+  return layout('edukasi', content);
+}
+function eduOpenAdd(){ eduForm=eduEmptyForm(); eduEditId=null; eduModal=true; render(); }
+function eduOpenEdit(id){ const e=edukasi.find(x=>x.id===id); eduEditId=id; eduForm={...e}; eduModal=true; render(); }
+function eduCloseModal(){ eduModal=false; eduEditId=null; render(); }
+function eduSave(e){
+  e.preventDefault();
+  const data = {
+    judul: document.getElementById('ef-judul').value,
+    ringkasan: document.getElementById('ef-ringkasan').value,
+    thumbnail: document.getElementById('ef-thumb').value,
+    kategori: document.getElementById('ef-kategori').value,
+    waktu_baca: parseInt(document.getElementById('ef-waktu').value)||5,
+    penulis: document.getElementById('ef-penulis').value,
+    sumber: document.getElementById('ef-sumber').value,
+    is_published: document.getElementById('ef-publish').checked ? 1 : 0,
+  };
+  if (eduEditId){
+    const idx = edukasi.findIndex(x=>x.id===eduEditId);
+    edukasi[idx] = { ...edukasi[idx], ...data };
+    toast('Konten diperbarui.','success');
+  } else {
+    edukasi.push({ id: nextEdukasiId++, ...data });
+    toast('Konten edukasi dikirim & tampil ke pasien.','success');
+  }
+  eduModal=false; eduEditId=null; render();
+}
+function eduDelete(id){
+  const e = edukasi.find(x=>x.id===id);
+  if (!confirm(`Hapus konten "${e.judul}"?`)) return;
+  edukasi = edukasi.filter(x=>x.id!==id);
+  toast('Konten dihapus.','success'); render();
+}
+function eduToggle(id){ const e=edukasi.find(x=>x.id===id); e.is_published = e.is_published?0:1; render(); }
+
+/* ============================= PAGE: PROFIL PERAWAT ============================= */
+let profilEditing=false; let profilForm={};
+function renderProfil(){
+  const photo = currentNurse.foto || `https://i.pravatar.cc/150?u=nursefallback`;
+  let body;
+  if (!profilEditing){
+    body = `
+    <div class="flex items-center gap-4 mb-6">
+      <img src="${photo}" class="w-20 h-20 rounded-full object-cover border-4 border-secondary" alt="${currentNurse.nama}"/>
+      <div><h2 class="font-display font-bold text-lg">${currentNurse.nama}</h2><p class="text-sm text-[#94A3B8]">${currentNurse.spesialis||'Perawat HyperCare'}</p><p class="text-xs text-[#94A3B8]">${currentNurse.pengalaman}</p></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
+      <div><p class="text-[#94A3B8] text-xs mb-1">Email</p><p class="font-medium">${currentNurse.email}</p></div>
+      <div><p class="text-[#94A3B8] text-xs mb-1">Tanggal Lahir</p><p class="font-medium">${fmtDate(currentNurse.tanggal_lahir)}</p></div>
+      <div><p class="text-[#94A3B8] text-xs mb-1">Jenis Kelamin</p><p class="font-medium">${currentNurse.jenis_kelamin}</p></div>
+      <div><p class="text-[#94A3B8] text-xs mb-1">Spesialis</p><p class="font-medium">${currentNurse.spesialis}</p></div>
+      <div class="sm:col-span-2"><p class="text-[#94A3B8] text-xs mb-1">Alamat</p><p class="font-medium">${currentNurse.alamat}</p></div>
+    </div>
+    <button onclick="profilForm={...currentNurse}; profilEditing=true; render();" class="btn-primary mt-6">Edit Profil</button>`;
+  } else {
+    body = `
+    <form onsubmit="profilSave(event)" class="space-y-4">
+      <div class="flex items-center gap-4">
+        <img src="${photo}" class="w-20 h-20 rounded-full object-cover border-4 border-secondary" alt=""/>
+        <div><p class="text-sm font-medium mb-1">Foto Profil</p><input type="file" accept="image/*" class="text-sm" disabled/><p class="text-xs text-[#94A3B8] mt-1">Pratinjau foto tidak tersedia di mode demo statis.</p></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2"><label class="text-sm font-medium block mb-1">Nama Lengkap</label><input id="pf-nama" class="input-soft" value="${profilForm.nama||''}" required/></div>
+        <div><label class="text-sm font-medium block mb-1">Spesialis</label>
+          <select id="pf-spesialis" class="input-soft">
+            ${['Spesialis Hipertensi','Spesialis Kardiovaskular','Perawat Umum'].map(s=>`<option ${profilForm.spesialis===s?'selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div><label class="text-sm font-medium block mb-1">Pengalaman</label><input id="pf-pengalaman" class="input-soft" value="${profilForm.pengalaman||''}" placeholder="cth: 5 Tahun Pengalaman"/></div>
+        <div><label class="text-sm font-medium block mb-1">Jenis Kelamin</label>
+          <select id="pf-jk" class="input-soft"><option value="">Pilih</option><option ${profilForm.jenis_kelamin==='Laki-laki'?'selected':''}>Laki-laki</option><option ${profilForm.jenis_kelamin==='Perempuan'?'selected':''}>Perempuan</option></select></div>
+        <div><label class="text-sm font-medium block mb-1">Tanggal Lahir</label><input id="pf-tgl" type="date" class="input-soft" value="${profilForm.tanggal_lahir||''}"/></div>
+        <div class="sm:col-span-2"><label class="text-sm font-medium block mb-1">Alamat</label><textarea id="pf-alamat" class="input-soft" rows="2">${profilForm.alamat||''}</textarea></div>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="btn-primary">Simpan Perubahan</button>
+        <button type="button" onclick="profilEditing=false; render();" class="btn-outline">Batal</button>
+      </div>
+    </form>`;
+  }
+  const content = `<main class="p-5 md:p-8 page-transition"><div class="card-soft p-6 max-w-2xl">${body}</div></main>`;
+  return layout('profil', content);
+}
+function profilSave(e){
+  e.preventDefault();
+  currentNurse.nama = document.getElementById('pf-nama').value;
+  currentNurse.spesialis = document.getElementById('pf-spesialis').value;
+  currentNurse.pengalaman = document.getElementById('pf-pengalaman').value;
+  currentNurse.jenis_kelamin = document.getElementById('pf-jk').value;
+  currentNurse.tanggal_lahir = document.getElementById('pf-tgl').value;
+  currentNurse.alamat = document.getElementById('pf-alamat').value;
+  toast('Profil berhasil diperbarui.','success');
+  profilEditing=false; render();
+}
+
+/* ============================= PAGE: NOTIFIKASI ============================= */
+function renderNotifikasi(){
+  const rows = notifikasi.map(n=>`
+    <div class="flex items-start gap-3 p-4 rounded-xl ${n.dibaca?'':'bg-secondary/60'} border border-[#F1EDE3]">
+      <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bell"></i></div>
+      <div class="flex-1">
+        <p class="text-sm font-semibold">${n.judul}</p>
+        <p class="text-sm text-[#64748B]">${n.pesan}</p>
+        <p class="text-xs text-[#94A3B8] mt-1">${n.waktu}</p>
+      </div>
+      ${!n.dibaca ? `<button onclick="notifRead(${n.id})" class="text-xs text-primary hover:underline flex-shrink-0">Tandai dibaca</button>`:''}
+    </div>`).join('') || `<p class="text-sm text-[#94A3B8] text-center py-8">Belum ada notifikasi.</p>`;
+
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="card-soft p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-semibold">Notifikasi</h3>
+        <button onclick="notifReadAll()" class="text-xs text-primary hover:underline">Tandai semua dibaca</button>
+      </div>
+      <div class="space-y-3">${rows}</div>
+    </div>
+  </main>`;
+  return layout('notifikasi', content);
+}
+function notifRead(id){ const n=notifikasi.find(x=>x.id===id); n.dibaca=true; render(); }
+function notifReadAll(){ notifikasi.forEach(n=>n.dibaca=true); render(); }
+
+/* ============================= PAGE: AKTIVITAS ============================= */
+function renderAktivitas(){
+  const rows = aktivitas.map(a=>`
+    <div class="flex items-center gap-3 p-3 border-b border-[#F8F5EC] last:border-0">
+      <span class="w-2 h-2 rounded-full bg-primary flex-shrink-0"></span>
+      <p class="text-sm text-[#64748B]"><strong class="text-[#1E293B] font-medium">${a.nama}</strong> ${a.deskripsi}</p>
+    </div>`).join('');
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="card-soft p-6"><h3 class="font-semibold mb-4">Aktivitas Terbaru</h3><div>${rows}</div></div>
+  </main>`;
+  return layout('aktivitas', content);
+}
+
+/* ============================= PAGE: RIWAYAT LOGIN ============================= */
+function renderRiwayatLogin(){
+  const rows = riwayatLogin.map(r=>`
+    <tr class="border-b border-[#F8F5EC]"><td class="py-3">${r.waktu}</td><td>${r.device}</td><td>${r.ip}</td></tr>`).join('');
+  const content = `
+  <main class="p-5 md:p-8 page-transition">
+    <div class="card-soft p-6">
+      <h3 class="font-semibold mb-4">Riwayat Login</h3>
+      <div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead><tr class="text-left text-[#94A3B8] border-b border-[#F1EDE3]"><th class="py-2">Waktu</th><th>Perangkat</th><th>IP Address</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>
+  </main>`;
+  return layout('riwayat-login', content);
+}
+
+/* ============================= MAIN RENDER ============================= */
+function render(){
+  const app = document.getElementById('app');
+  if (!state.loggedIn){ app.innerHTML = renderLogin(); return; }
+  let html;
+  switch(state.route){
+    case 'datapasien': html = renderDataPasien(); break;
+    case 'monitoring': html = renderMonitoring(); break;
+    case 'statistik': html = renderStatistik(); break;
+    case 'chatperawat': html = renderChatPerawat(); break;
+    case 'edukasi': html = renderEdukasi(); break;
+    case 'profil': html = renderProfil(); break;
+    case 'notifikasi': html = renderNotifikasi(); break;
+    case 'aktivitas': html = renderAktivitas(); break;
+    case 'riwayat-login': html = renderRiwayatLogin(); break;
+    default: html = renderDashboard();
+  }
+  app.innerHTML = html;
+}
+
+render();
 </script>
 </body>
 </html>
