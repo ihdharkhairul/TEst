@@ -14,7 +14,7 @@ const HC_NAVBAR = `
       <a href="index.html#perawat" data-nav="perawat" class="navbar-link">Perawat</a>
       <a href="index.html#edukasi" data-nav="edukasi" class="navbar-link">Edukasi</a>
       <a href="index.html#faq" data-nav="faq" class="navbar-link">FAQ</a>
-      <a href="login-pasien.html" data-nav="login" class="navbar-link">Login</a>
+      <a href="login.html" data-nav="login" class="navbar-link">Login</a>
     </div>
     <div class="hidden lg:flex items-center gap-3">
       <a href="register-pasien.html" class="btn-primary text-sm">Daftar Sekarang</a>
@@ -28,7 +28,7 @@ const HC_NAVBAR = `
     <a href="index.html#perawat" class="sidebar-link">Perawat</a>
     <a href="index.html#edukasi" class="sidebar-link">Edukasi</a>
     <a href="index.html#faq" class="sidebar-link">FAQ</a>
-    <a href="login-pasien.html" class="sidebar-link">Login</a>
+    <a href="login.html" class="sidebar-link">Login</a>
     <a href="register-pasien.html" class="btn-primary text-center mt-2">Daftar Sekarang</a>
   </div>
 </nav>`;

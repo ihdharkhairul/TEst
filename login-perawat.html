@@ -158,6 +158,20 @@ let riwayatLogin = [
 /* ============================= APP STATE ============================= */
 let state = { loggedIn:false, route:'login', sidebarOpen:false, activePasienId:null, charts:{} };
 
+/* Auto-login jika datang dari halaman login gabungan (login.html) */
+(function autoLoginFromSharedLogin(){
+  const email = sessionStorage.getItem('hc_autologin_email');
+  if (email){
+    const found = nurses.find(n => n.email === email);
+    if (found){
+      currentNurse = found;
+      state.loggedIn = true;
+      state.route = 'dashboard';
+    }
+    sessionStorage.removeItem('hc_autologin_email');
+  }
+})();
+
 function nowStr(){ const d=new Date(); return d.toISOString().slice(0,16).replace('T',' '); }
 function destroyCharts(){ Object.values(state.charts).forEach(c=>c && c.destroy()); state.charts={}; }
 
